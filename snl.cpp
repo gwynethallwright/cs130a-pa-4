@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <set>
 
 std::vector<std::vector<int>> * create_transition_matrix(int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
 	static std::vector<std::vector<int>> transition_matrix;
@@ -28,12 +29,35 @@ std::vector<std::vector<int>> * create_transition_matrix(int board_size, std::un
 }
 
 void print_transition_matrix(std::vector<std::vector<int>> * transition_matrix){
-	for(std::vector<std::vector<int>>::iterator it = transition_matrix->begin(); it != transition_matrix->end(); ++it){
-		for(std::vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
+	for (std::vector<std::vector<int>>::iterator it = transition_matrix->begin(); it != transition_matrix->end(); ++it){
+		for (std::vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
 			std::cout << *(it2) << " ";
 		}
 		std::cout << "\n";
 	}
+}
+
+std::set<int> * possible_previous_squares(int current_square, std::vector<std::vector<int>> * transition_matrix){
+	static std::set<int> possible_previous_squares;
+	std::set<int>::iterator set_it = possible_previous_squares.begin();
+	int previous_square = 1;
+	for (std::vector<std::vector<int>>::iterator it = transition_matrix->begin(); it != transition_matrix->end(); ++it){
+		for (std::vector<int>::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2){
+			if ((*it2) == current_square){
+				possible_previous_squares.insert(set_it, previous_square);
+			}
+		}
+		++previous_square;
+	}
+	return &possible_previous_squares;
+}
+
+void print_possible_previous_squares(int current_square, std::vector<std::vector<int>> * transition_matrix){
+	std::set<int> * possible_previous_test = possible_previous_squares(current_square, transition_matrix);
+	for(std::set<int>::iterator it = possible_previous_test->begin(); it != possible_previous_test->end(); ++it){
+		std::cout << (*it) << " ";
+	}
+	std::cout << "\n";
 }
 
 int main(int argc, char** argv){
@@ -42,4 +66,5 @@ int main(int argc, char** argv){
 	std::unordered_map<int, int> ladders = {};
 	std::vector<std::vector<int>> * transition_matrix = create_transition_matrix(board_size, (&snakes), (&ladders));
 	print_transition_matrix(transition_matrix);
+	print_possible_previous_squares(5, transition_matrix);
 }
