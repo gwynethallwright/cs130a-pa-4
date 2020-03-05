@@ -11,6 +11,7 @@
 struct queue_entry{ 
     int square_number;
     int distance_from_start;
+    int type_of_square;
     queue_entry* next_node;
 };
 
@@ -21,7 +22,7 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
 	}
 	std::queue<queue_entry*> bfs_queue;
 	visited[start_square] = true;
-	queue_entry start = {start_square, 0, nullptr};
+	queue_entry start = {start_square, 0, 0, nullptr};
     bfs_queue.push(&start);
     queue_entry* current;
     while (!bfs_queue.empty())
@@ -36,19 +37,22 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
         {
             if (j <= board_size){
             	if (!visited[j]){
-            		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry*));
+            		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
             		new_entry->distance_from_start = current->distance_from_start+1;
                 	visited[j] = true;
                 	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(j);
 		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(j);
 					if (ladders_it != ladders->end()){
 						new_entry->square_number = ladders_it->second;
+						new_entry->type_of_square = 1;
 					}
 					else if (snakes_it != snakes->end()){
 						new_entry->square_number = snakes_it->second;
+						new_entry->type_of_square = -1;
 					}
 					else{
 						new_entry->square_number = j;
+						new_entry->type_of_square = 0;
 					}
 					new_entry->next_node = current;
 					bfs_queue.push(new_entry);
@@ -56,15 +60,20 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
             }
         }
     }
-    
     int square;
     queue_entry* iterate_thru = current;
+
     while (iterate_thru->next_node != nullptr){
+    	if (iterate_thru->type_of_square == 1){
+    		std::cout << "+";
+    	}
+    	else if (iterate_thru->type_of_square == -1){
+    		std::cout << "-";
+    	}
     	std::cout << iterate_thru->square_number << " ";
     	iterate_thru = iterate_thru->next_node;
-    }
-    std::cout << "\n";
-    
+	}
+	std::cout << "\n";
     return current->distance_from_start;
 }
 
