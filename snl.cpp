@@ -7,6 +7,7 @@
 #include <set>
 #include <queue>
 #include <list>
+#include <stack>
 
 struct queue_entry{ 
     int square_number;
@@ -62,18 +63,28 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
             }
         }
     }
-    int square;
     queue_entry* iterate_thru = current;
+    std::stack <std::string> path;
+    std::string output;
 
     while (iterate_thru->next_node != nullptr){
     	if (iterate_thru->type_of_square == 1){
-    		std::cout << iterate_thru->original_square << "+";
+    		output = (std::to_string(iterate_thru->original_square)).append("+");
     	}
     	else if (iterate_thru->type_of_square == -1){
-    		std::cout << iterate_thru->original_square << "-";
+    		output = (std::to_string(iterate_thru->original_square)).append("-");
     	}
-    	std::cout << iterate_thru->square_number << " ";
+    	else {
+    		output = "";
+    	}
+    	output = output.append(std::to_string(iterate_thru->square_number));
+    	path.push(output);
     	iterate_thru = iterate_thru->next_node;
+	}
+	std::cout << "1 ";
+	while (!path.empty()){
+		std::cout << path.top() << " ";
+		path.pop();
 	}
 	std::cout << "\n";
     return current->distance_from_start;
