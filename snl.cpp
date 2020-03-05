@@ -32,7 +32,7 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
             break; 
         }
         bfs_queue.pop();
-        for (int j = current->square_number+1; j < current->square_number+7; ++j)
+        for (int j = current->square_number+6; j > current->square_number; --j)
         {
             if (j <= board_size){
             	if (!visited[j]){
