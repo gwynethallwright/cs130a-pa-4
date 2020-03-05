@@ -17,7 +17,14 @@ struct queue_entry{
     queue_entry* next_node;
 };
 
-int return_minimum_throws(int start_square, int end_square, int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
+
+auto return_minimum_throws(int start_square, int end_square, int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
+	
+	struct return_struct{
+		int minimum_moves;
+		std::stack<std::string>* moves_list;
+	};
+
 	std::unordered_map<int, bool> visited;
 	for (int i = 1; i < board_size+1; ++i){
 		visited.insert({{i, false}});
@@ -64,7 +71,7 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
         }
     }
     queue_entry* iterate_thru = current;
-    std::stack <std::string> path;
+    static std::stack <std::string> path;
     std::string output;
 
     while (iterate_thru->next_node != nullptr){
@@ -81,13 +88,16 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
     	path.push(output);
     	iterate_thru = iterate_thru->next_node;
 	}
+    return return_struct {current->distance_from_start, (&path)};
+}
+
+void print_path(std::stack<std::string>* path){
 	std::cout << "1 ";
-	while (!path.empty()){
-		std::cout << path.top() << " ";
-		path.pop();
+	while (!path->empty()){
+		std::cout << path->top() << " ";
+		path->pop();
 	}
 	std::cout << "\n";
-    return current->distance_from_start;
 }
 
 int main(int argc, char** argv){
@@ -138,7 +148,8 @@ int main(int argc, char** argv){
 			snakes.insert({{std::stoi(start), std::stoi(end)}});
 		}
 
-		int min_throws = return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
+		auto [min_throws, path] = return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
 		std::cout << min_throws << "\n";
+		print_path(path);
   	}
 }
