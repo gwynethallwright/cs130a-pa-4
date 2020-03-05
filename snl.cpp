@@ -32,17 +32,21 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
         bfs_queue.pop(); 
         for (int j = current.square_number+1; j < current.square_number+7; ++j)
         {
-            if (j < board_size){
+            if (j <= board_size){
             	if (!visited[j]){
-            		queue_entry new_entry = {j, current.distance_from_start+1};
+            		queue_entry new_entry;
+            		new_entry.distance_from_start = current.distance_from_start+1;
                 	visited[j] = true; 
                 	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(j);
 		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(j);
 					if (snakes_it != snakes->end()){
-						new_entry.distance_from_start = snakes_it->second;
+						new_entry.square_number = snakes_it->second;
 					}
 					else if (ladders_it != ladders->end()){
-						new_entry.distance_from_start = ladders_it->second;
+						new_entry.square_number = ladders_it->second;
+					}
+					else{
+						new_entry.square_number = j;
 					}
 					bfs_queue.push(new_entry);
             	}
@@ -91,12 +95,16 @@ int main(int argc, char** argv){
 			ladders.insert({{std::stoi(start), std::stoi(end)}});
 		}
 
+		std::getline(ss, parse_to, '\n');
+		std::stringstream ss_line_3(parse_to);
+
 		for (int i = 0; i < 2*num_snakes; ++i){
-			std::getline(ss_line_2, start, ' ');
-			std::getline(ss_line_2, end, ' ');
+			std::getline(ss_line_3, start, ' ');
+			std::getline(ss_line_3, end, ' ');
 			snakes.insert({{std::stoi(start), std::stoi(end)}});
 		}
-		
-		std::cout << return_minimum_throws(1, board_size, board_size, &snakes, &ladders) << "\n";
+
+		int min_throws = return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
+		std::cout << min_throws << "\n";
   	}
 }
