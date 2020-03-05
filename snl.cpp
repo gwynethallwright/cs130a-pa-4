@@ -53,10 +53,50 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
 }
 
 int main(int argc, char** argv){
-	int board_size = 10;
-	int start_square = 1;
-	int end_square = 10;
-	std::unordered_map<int, int> snakes = {};
-	std::unordered_map<int, int> ladders = {};
-	std::cout << return_minimum_throws(start_square, end_square, board_size, &snakes, &ladders) << "\n";
+
+	std::string the_input = argv[1];
+	std::stringstream ss(the_input);
+  	std::string parse_to;
+
+  	std::getline(ss, parse_to, '\n');
+  	int num_cases = std::stoi(parse_to);
+
+  	for (int game_num = 1; game_num < num_cases+1; ++game_num){
+
+  		std::getline(ss, parse_to, '\n');
+  		std::stringstream ss_line_1(parse_to);
+
+  		std::string board_size_str;
+  		std::getline(ss_line_1, board_size_str, ' ');
+  		std::string num_snakes_str;
+  		std::getline(ss_line_1, num_snakes_str, ' ');
+  		std::string num_ladders_str;
+  		std::getline(ss_line_1, num_ladders_str, ' ');
+
+  		int board_size = std::stoi(board_size_str)*std::stoi(board_size_str);
+  	  	int num_snakes = std::stoi(num_snakes_str);
+  		int num_ladders = std::stoi(num_ladders_str);
+
+		std::unordered_map<int, int> snakes = {};
+		std::unordered_map<int, int> ladders = {};
+
+		std::string start;
+		std::string end;
+		std::getline(ss, parse_to, '\n');
+		std::stringstream ss_line_2(parse_to);
+
+		for (int i = 0; i < 2*num_ladders; ++i){
+			std::getline(ss_line_2, start, ' ');
+			std::getline(ss_line_2, end, ' ');
+			ladders.insert({{std::stoi(start), std::stoi(end)}});
+		}
+
+		for (int i = 0; i < 2*num_snakes; ++i){
+			std::getline(ss_line_2, start, ' ');
+			std::getline(ss_line_2, end, ' ');
+			snakes.insert({{std::stoi(start), std::stoi(end)}});
+		}
+		
+		std::cout << return_minimum_throws(1, board_size, board_size, &snakes, &ladders) << "\n";
+  	}
 }
