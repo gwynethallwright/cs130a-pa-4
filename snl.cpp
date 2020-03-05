@@ -41,11 +41,11 @@ int return_minimum_throws(int start_square, int end_square, int board_size, std:
                 	visited[j] = true;
                 	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(j);
 		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(j);
-					if (snakes_it != snakes->end()){
-						new_entry->square_number = snakes_it->second;
-					}
-					else if (ladders_it != ladders->end()){
+					if (ladders_it != ladders->end()){
 						new_entry->square_number = ladders_it->second;
+					}
+					else if (snakes_it != snakes->end()){
+						new_entry->square_number = snakes_it->second;
 					}
 					else{
 						new_entry->square_number = j;
