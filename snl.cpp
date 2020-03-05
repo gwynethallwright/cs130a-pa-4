@@ -5,12 +5,22 @@
 #include <string>
 #include <unordered_map>
 
-std::vector<std::vector<int>> * create_transition_matrix(int board_size, std::unordered_map<int, int> snakes, std::unordered_map<int, int> ladders){
+std::vector<std::vector<int>> * create_transition_matrix(int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
 	static std::vector<std::vector<int>> transition_matrix;
 	for (int board_position = 1; board_position != board_size+1; ++board_position){
 		std::vector<int> new_positions;
 		for (int num_rolled = 1; num_rolled != 7; ++num_rolled){
-			new_positions.push_back(std::min(board_position+num_rolled, board_size));
+			std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(board_position+num_rolled);
+		    std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(board_position+num_rolled);
+			if (snakes_it != snakes->end()){
+				new_positions.push_back(snakes_it->second);	
+			}
+			else if (ladders_it != ladders->end()){
+				new_positions.push_back(ladders_it->second);
+			}
+			else{
+				new_positions.push_back(std::min(board_position+num_rolled, board_size));
+			}
 		}
 		transition_matrix.push_back(new_positions);
 	}
@@ -28,8 +38,8 @@ void print_transition_matrix(std::vector<std::vector<int>> * transition_matrix){
 
 int main(int argc, char** argv){
 	int board_size = 10;
-	std::unordered_map<int, int> snakes;
-	std::unordered_map<int, int> ladders;
-	std::vector<std::vector<int>> * transition_matrix = create_transition_matrix(board_size, snakes, ladders);
+	std::unordered_map<int, int> snakes = {};
+	std::unordered_map<int, int> ladders = {};
+	std::vector<std::vector<int>> * transition_matrix = create_transition_matrix(board_size, (&snakes), (&ladders));
 	print_transition_matrix(transition_matrix);
 }
