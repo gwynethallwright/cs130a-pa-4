@@ -17,6 +17,23 @@ struct queue_entry{
     queue_entry* next_node;
 };
 
+void make_empty(queue_entry** t){
+	if ((*t) == nullptr)
+	    return;
+	{
+	    std::cout << (*t) << " \n";
+	    make_empty(&((*t)->next_node));
+	    free(*t);
+	    *(&(*t)) = nullptr;
+	}
+	return;
+}
+
+void free_memory(std::vector<queue_entry*>* pointers_to_delete){
+	for (std::vector<queue_entry*>::iterator it = pointers_to_delete->begin(); it != pointers_to_delete->end(); ++it) {
+    	make_empty(&(*it));
+    }
+}
 
 auto return_minimum_throws(int start_square, int end_square, int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
 	
@@ -31,9 +48,19 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
 	}
 	std::queue<queue_entry*> bfs_queue;
 	visited[start_square] = true;
-	queue_entry start = {start_square, 0, 0, 0, nullptr};
-    bfs_queue.push(&start);
+	queue_entry* start = (queue_entry*) malloc(sizeof(queue_entry));
+	start->square_number = start_square;
+	start->distance_from_start =  0; 
+	start->type_of_square = 0;
+	start->original_square =  0;
+	start->next_node = nullptr;
+
+    bfs_queue.push(start);
     queue_entry* current;
+
+    std::vector<queue_entry*> pointers_to_delete;
+    pointers_to_delete.push_back(start);
+
     while (!bfs_queue.empty())
     { 
         current = bfs_queue.front();
@@ -65,6 +92,7 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
 						new_entry->type_of_square = 0;
 					}
 					new_entry->next_node = current;
+					pointers_to_delete.push_back(new_entry);
 					bfs_queue.push(new_entry);
             	}
             }
@@ -88,7 +116,16 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
     	path.push(output);
     	iterate_thru = iterate_thru->next_node;
 	}
-    return return_struct {current->distance_from_start, (&path)};
+
+	int min_dist = current->distance_from_start;
+	
+	for (std::vector<queue_entry*>::iterator it = pointers_to_delete.begin(); it != pointers_to_delete.end(); ++it) {
+    	if ((&(*it)) != nullptr){
+    		free(*it);
+    	}
+    };
+
+    return return_struct {min_dist, (&path)};
 }
 
 void print_path(std::stack<std::string>* path){
@@ -149,7 +186,7 @@ int main(int argc, char** argv){
 		}
 
 		auto [min_throws, path] = return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
-		std::cout << min_throws << "\n";
+		std::cout << "Board Game #" << game_num << ":\n" << min_throws << "\n";
 		print_path(path);
   	}
 }
