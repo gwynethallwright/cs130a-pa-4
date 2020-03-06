@@ -35,7 +35,16 @@ void free_memory(std::vector<queue_entry*>* pointers_to_delete){
     }
 }
 
-auto return_minimum_throws(int start_square, int end_square, int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
+void print_path(std::stack<std::string>* path){
+	std::cout << "1 ";
+	while (!path->empty()){
+		std::cout << path->top() << " ";
+		path->pop();
+	}
+	std::cout << "\n";
+}
+
+void return_minimum_throws(int start_square, int end_square, int board_size, std::unordered_map<int, int> * snakes, std::unordered_map<int, int> * ladders){
 	
 	struct return_struct{
 		int minimum_moves;
@@ -49,6 +58,9 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
 	std::queue<queue_entry*> bfs_queue;
 	visited[start_square] = true;
 	queue_entry* start = (queue_entry*) malloc(sizeof(queue_entry));
+
+	int num_alloc = 1;
+
 	start->square_number = start_square;
 	start->distance_from_start =  0; 
 	start->type_of_square = 0;
@@ -74,6 +86,7 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
             if (j <= board_size){
             	if (!visited[j]){
             		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
+            		++num_alloc;
             		new_entry->distance_from_start = current->distance_from_start+1;
             		new_entry->original_square = j;
                 	visited[j] = true;
@@ -99,7 +112,7 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
         }
     }
     queue_entry* iterate_thru = current;
-    static std::stack <std::string> path;
+    std::stack <std::string> path;
     std::string output;
 
     while (iterate_thru->next_node != nullptr){
@@ -116,33 +129,34 @@ auto return_minimum_throws(int start_square, int end_square, int board_size, std
     	path.push(output);
     	iterate_thru = iterate_thru->next_node;
 	}
-
 	int min_dist = current->distance_from_start;
+
+	int num_free = 0;
 	
 	for (std::vector<queue_entry*>::iterator it = pointers_to_delete.begin(); it != pointers_to_delete.end(); ++it) {
     	if ((&(*it)) != nullptr){
     		free(*it);
+    		++ num_free;
     	}
     };
 
-    return return_struct {min_dist, (&path)};
+    std::cout << ":\n" << min_dist << "\n";
+	print_path(&path);
 }
 
-void print_path(std::stack<std::string>* path){
-	std::cout << "1 ";
-	while (!path->empty()){
-		std::cout << path->top() << " ";
-		path->pop();
-	}
-	std::cout << "\n";
+template<typename T>
+inline void freeContainer(T& p_container)
+{
+    T empty;
+    using std::swap;
+    swap(p_container, empty);
 }
+
 
 int main(int argc, char** argv){
-
 	std::string the_input = argv[1];
 	std::stringstream ss(the_input);
   	std::string parse_to;
-
   	std::getline(ss, parse_to, '\n');
   	int num_cases = std::stoi(parse_to);
 
@@ -164,29 +178,39 @@ int main(int argc, char** argv){
 
 		std::unordered_map<int, int> snakes = {};
 		std::unordered_map<int, int> ladders = {};
-
-		std::string start;
-		std::string end;
+		
 		std::getline(ss, parse_to, '\n');
 		std::stringstream ss_line_2(parse_to);
 
 		for (int i = 0; i < 2*num_ladders; ++i){
-			std::getline(ss_line_2, start, ' ');
-			std::getline(ss_line_2, end, ' ');
-			ladders.insert({{std::stoi(start), std::stoi(end)}});
+			std::string * start = new std::string;
+			std::string * end = new std::string;
+			std::getline(ss_line_2, *start, ' ');
+			std::getline(ss_line_2, *end, ' ');
+			int start_int = atoi( start->c_str() );
+			int end_int = atoi( end->c_str() );
+			ladders[start_int] = end_int;
+			delete start;
+			delete end;
 		}
 
 		std::getline(ss, parse_to, '\n');
 		std::stringstream ss_line_3(parse_to);
 
 		for (int i = 0; i < 2*num_snakes; ++i){
-			std::getline(ss_line_3, start, ' ');
-			std::getline(ss_line_3, end, ' ');
-			snakes.insert({{std::stoi(start), std::stoi(end)}});
+			std::string * start = new std::string;
+			std::string * end = new std::string;
+			std::getline(ss_line_3, *start, ' ');
+			std::getline(ss_line_3, *end, ' ');
+			int start_int = atoi( start->c_str() );
+			int end_int = atoi( end->c_str() );
+			snakes[start_int] = end_int;
+			delete start;
+			delete end;
 		}
 
-		auto [min_throws, path] = return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
-		std::cout << "Board Game #" << game_num << ":\n" << min_throws << "\n";
-		print_path(path);
+		std::cout << "Board Game #" << game_num;
+		return_minimum_throws(1, board_size, board_size, &snakes, &ladders);
   	}
+  	return 0;
 }
