@@ -17,24 +17,6 @@ struct queue_entry{
     queue_entry* next_node;
 };
 
-void make_empty(queue_entry** t){
-	if ((*t) == nullptr)
-	    return;
-	{
-	    std::cout << (*t) << " \n";
-	    make_empty(&((*t)->next_node));
-	    free(*t);
-	    *(&(*t)) = nullptr;
-	}
-	return;
-}
-
-void free_memory(std::vector<queue_entry*>* pointers_to_delete){
-	for (std::vector<queue_entry*>::iterator it = pointers_to_delete->begin(); it != pointers_to_delete->end(); ++it) {
-    	make_empty(&(*it));
-    }
-}
-
 void print_path(std::stack<std::string>* path){
 	std::cout << "1 ";
 	while (!path->empty()){
@@ -58,8 +40,6 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 	std::queue<queue_entry*> bfs_queue;
 	visited[start_square] = true;
 	queue_entry* start = (queue_entry*) malloc(sizeof(queue_entry));
-
-	int num_alloc = 1;
 
 	start->square_number = start_square;
 	start->distance_from_start =  0; 
@@ -86,7 +66,6 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
             if (j <= board_size){
             	if (!visited[j]){
             		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
-            		++num_alloc;
             		new_entry->distance_from_start = current->distance_from_start+1;
             		new_entry->original_square = j;
                 	visited[j] = true;
@@ -130,28 +109,16 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
     	iterate_thru = iterate_thru->next_node;
 	}
 	int min_dist = current->distance_from_start;
-
-	int num_free = 0;
 	
 	for (std::vector<queue_entry*>::iterator it = pointers_to_delete.begin(); it != pointers_to_delete.end(); ++it) {
     	if ((&(*it)) != nullptr){
     		free(*it);
-    		++ num_free;
     	}
     };
 
     std::cout << ":\n" << min_dist << "\n";
 	print_path(&path);
 }
-
-template<typename T>
-inline void freeContainer(T& p_container)
-{
-    T empty;
-    using std::swap;
-    swap(p_container, empty);
-}
-
 
 int main(int argc, char** argv){
 	std::string the_input = argv[1];
