@@ -134,10 +134,10 @@ int main(int argc, char** argv){
 
   		std::string board_size_str;
   		std::getline(ss_line_1, board_size_str, ' ');
-  		std::string num_snakes_str;
-  		std::getline(ss_line_1, num_snakes_str, ' ');
   		std::string num_ladders_str;
   		std::getline(ss_line_1, num_ladders_str, ' ');
+  		std::string num_snakes_str;
+  		std::getline(ss_line_1, num_snakes_str, ' ');
 
   		int board_size = std::stoi(board_size_str)*std::stoi(board_size_str);
   	  	int num_snakes = std::stoi(num_snakes_str);
