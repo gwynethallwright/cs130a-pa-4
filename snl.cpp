@@ -66,22 +66,39 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
             if (j <= board_size){
             	if (!visited[j]){
             		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
-            		new_entry->distance_from_start = current->distance_from_start+1;
             		new_entry->original_square = j;
                 	visited[j] = true;
-                	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(j);
-		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(j);
-					if (ladders_it != ladders->end()){
-						new_entry->square_number = ladders_it->second;
-						new_entry->type_of_square = 1;
-					}
-					else if (snakes_it != snakes->end()){
-						new_entry->square_number = snakes_it->second;
-						new_entry->type_of_square = -1;
-					}
-					else{
-						new_entry->square_number = j;
+                	int current_square = j;
+                	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(current_square);
+		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(current_square);
+                	if ((snakes_it == snakes->end()) && (ladders_it == ladders->end())){
+                		new_entry->square_number = j;
 						new_entry->type_of_square = 0;
+						new_entry->distance_from_start = current->distance_from_start+1;
+                	}
+                	else{
+                		new_entry->distance_from_start = current->distance_from_start;
+						while (true){
+							snakes_it = snakes->find(current_square);
+			    		    ladders_it = ladders->find(current_square);
+							if (ladders_it != ladders->end()){
+								new_entry->square_number = ladders_it->second;
+								new_entry->type_of_square = 1;
+								++new_entry->distance_from_start;
+								current_square = ladders_it->second;
+								visited[current_square] = true;
+							}
+							else if (snakes_it != snakes->end()){
+								new_entry->square_number = snakes_it->second;
+								new_entry->type_of_square = -1;
+								++new_entry->distance_from_start;
+								current_square = snakes_it->second;
+								visited[current_square] = true;
+							}
+							else{
+								break;
+							}	
+						}
 					}
 					new_entry->next_node = current;
 					pointers_to_delete.push_back(new_entry);
