@@ -83,8 +83,22 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 						while (true){
 							snakes_it = snakes->find(current_square);
 			    		    ladders_it = ladders->find(current_square);
-							if (ladders_it != ladders->end()){
+							if (snakes_it != snakes->end()){
+								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
+            					new_entry->original_square = current_square;
+            					new_entry->next_node = pointer_to_current_entry;
 
+								new_entry->square_number = snakes_it->second;
+								new_entry->type_of_square = -1;
+								new_entry->distance_from_start = pointer_to_current_entry->distance_from_start+1;
+								current_square = snakes_it->second;
+								visited[current_square] = true;
+								pointer_to_current_entry = new_entry;
+
+								pointers_to_delete.push_back(new_entry);
+								/*bfs_queue.push(new_entry);*/
+							}
+							else if (ladders_it != ladders->end()){
 								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
             					new_entry->original_square = current_square;
             					new_entry->next_node = pointer_to_current_entry;
@@ -99,22 +113,10 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 								pointers_to_delete.push_back(new_entry);
 								bfs_queue.push(new_entry);
 							}
-							else if (snakes_it != snakes->end()){
-								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
-            					new_entry->original_square = current_square;
-            					new_entry->next_node = pointer_to_current_entry;
-
-								new_entry->square_number = snakes_it->second;
-								new_entry->type_of_square = -1;
-								new_entry->distance_from_start = pointer_to_current_entry->distance_from_start+1;
-								current_square = snakes_it->second;
-								visited[current_square] = true;
-								pointer_to_current_entry = new_entry;
-
-								pointers_to_delete.push_back(new_entry);
-								bfs_queue.push(new_entry);
-							}
 							else{
+								if (pointer_to_current_entry->type_of_square == -1){
+									bfs_queue.push(pointer_to_current_entry);
+								}
 								break;
 							}	
 						}
