@@ -96,7 +96,6 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 								pointer_to_current_entry = new_entry;
 
 								pointers_to_delete.push_back(new_entry);
-								/*bfs_queue.push(new_entry);*/
 							}
 							else if (ladders_it != ladders->end()){
 								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
@@ -111,12 +110,9 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 								pointer_to_current_entry = new_entry;
 
 								pointers_to_delete.push_back(new_entry);
-								bfs_queue.push(new_entry);
 							}
 							else{
-								if (pointer_to_current_entry->type_of_square == -1){
-									bfs_queue.push(pointer_to_current_entry);
-								}
+								bfs_queue.push(pointer_to_current_entry);
 								break;
 							}	
 						}
