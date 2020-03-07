@@ -38,11 +38,10 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
 		visited.insert({{i, false}});
 	}
 	std::queue<queue_entry*> bfs_queue;
-	visited[start_square] = true;
 	queue_entry* start = (queue_entry*) malloc(sizeof(queue_entry));
 
 	start->square_number = start_square;
-	start->distance_from_start =  0; 
+	start->distance_from_start = 0; 
 	start->type_of_square = 0;
 	start->original_square =  0;
 	start->next_node = nullptr;
@@ -61,48 +60,65 @@ void return_minimum_throws(int start_square, int end_square, int board_size, std
             break; 
         }
         bfs_queue.pop();
-        for (int j = current->square_number+6; j > current->square_number; --j)
+        for (int j = current->square_number+6; j >= current->square_number; --j)
         {
             if (j <= board_size){
             	if (!visited[j]){
-            		queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
-            		new_entry->original_square = j;
                 	visited[j] = true;
                 	int current_square = j;
                 	std::unordered_map<int, int>::const_iterator snakes_it = snakes->find(current_square);
 		    		std::unordered_map<int, int>::const_iterator ladders_it = ladders->find(current_square);
                 	if ((snakes_it == snakes->end()) && (ladders_it == ladders->end())){
-                		new_entry->square_number = j;
+						queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
+            			new_entry->original_square = j;
+            			new_entry->distance_from_start = current->distance_from_start+1;
+						new_entry->next_node = current;
 						new_entry->type_of_square = 0;
-						new_entry->distance_from_start = current->distance_from_start+1;
+						new_entry->square_number = j;
+						pointers_to_delete.push_back(new_entry);
+						bfs_queue.push(new_entry);
                 	}
                 	else{
-                		new_entry->distance_from_start = current->distance_from_start;
+                		queue_entry* pointer_to_current_entry = current;
 						while (true){
 							snakes_it = snakes->find(current_square);
 			    		    ladders_it = ladders->find(current_square);
 							if (ladders_it != ladders->end()){
+
+								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
+            					new_entry->original_square = current_square;
+            					new_entry->next_node = pointer_to_current_entry;
 								new_entry->square_number = ladders_it->second;
 								new_entry->type_of_square = 1;
-								++new_entry->distance_from_start;
+								new_entry->distance_from_start = pointer_to_current_entry->distance_from_start+1;
+
 								current_square = ladders_it->second;
 								visited[current_square] = true;
+								pointer_to_current_entry = new_entry;
+
+								pointers_to_delete.push_back(new_entry);
+								bfs_queue.push(new_entry);
 							}
 							else if (snakes_it != snakes->end()){
+								queue_entry* new_entry = (queue_entry*) malloc(sizeof(queue_entry));
+            					new_entry->original_square = current_square;
+            					new_entry->next_node = pointer_to_current_entry;
+
 								new_entry->square_number = snakes_it->second;
 								new_entry->type_of_square = -1;
-								++new_entry->distance_from_start;
+								new_entry->distance_from_start = pointer_to_current_entry->distance_from_start+1;
 								current_square = snakes_it->second;
 								visited[current_square] = true;
+								pointer_to_current_entry = new_entry;
+
+								pointers_to_delete.push_back(new_entry);
+								bfs_queue.push(new_entry);
 							}
 							else{
 								break;
 							}	
 						}
 					}
-					new_entry->next_node = current;
-					pointers_to_delete.push_back(new_entry);
-					bfs_queue.push(new_entry);
             	}
             }
         }
